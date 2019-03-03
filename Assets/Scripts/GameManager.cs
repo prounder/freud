@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -37,6 +38,7 @@ public class GameManager : MonoBehaviour
 	private List<Quaternion> headRotHistory;
 
 	private AudioSource confession;
+	private Text instructions;
 
 	private bool allPresent;
 
@@ -76,6 +78,7 @@ public class GameManager : MonoBehaviour
  		ovrCameraRig = GameObject.Find("OVRCameraRig");
  		therapist = GameObject.Find("Therapist");
  		localAvatar = GameObject.Find("LocalAvatar");
+ 		instructions = GameObject.Find("TV Info").GetComponent<Text>();
 
  		startLocation = ovrCameraRig.transform.position;
     }
@@ -140,14 +143,11 @@ public class GameManager : MonoBehaviour
 	    	switch(stage){
 	    		case 1:
 	    			confession.clip = Microphone.Start("", true, 300, 44100);
+	    			instructions.text = "What's on your mind?";
 	    			break;
 	    		case 2:
 	    			Microphone.End("");
-
-	    			// fHead.SetActive(false);
-	    			// fBody.SetActive(false);
-	    			// fHead.transform.SetParent(headObject.transform);
-	    			// fHead.transform.localPosition = new Vector3(0, 0, 0);
+	    			instructions.text = "Now you're in charge.";
 	    			Toggle();
 	    			
 	    			ovrCameraRig.transform.position = therapist.transform.position;
@@ -163,11 +163,13 @@ public class GameManager : MonoBehaviour
 	        		dummyRight.transform.rotation = rightRotHistory[index] * Quaternion.Euler(-90f, 0f, 0f);
 	    			break;
 	    		case 3:
+	    			instructions.text = "How can you help your friend?";	    			
 	    			confession.Play();
 	    			break;
 	    		case 4:
 	    			ovrCameraRig.transform.position = startLocation;
 	    			localAvatar.transform.position = startLocation;
+	    			instructions.text = "Press A To Begin";
 	    			Toggle();
 	    			// fHead.SetActive(true);
 	    			// fHead.transform.SetParent(null);
