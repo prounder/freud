@@ -144,8 +144,11 @@ public class GameManager : MonoBehaviour
 	    		case 2:
 	    			Microphone.End("");
 
-	    			fHead.SetActive(false);
-	    			fBody.SetActive(false);
+	    			// fHead.SetActive(false);
+	    			// fBody.SetActive(false);
+	    			// fHead.transform.SetParent(headObject.transform);
+	    			// fHead.transform.localPosition = new Vector3(0, 0, 0);
+	    			Toggle();
 	    			
 	    			ovrCameraRig.transform.position = therapist.transform.position;
 	    			localAvatar.transform.position = therapist.transform.position;
@@ -155,9 +158,9 @@ public class GameManager : MonoBehaviour
 					dummyLeft.transform.position = leftPosHistory[index];
 					dummyRight.transform.position = rightPosHistory[index];
 
-					dummyHead.transform.rotation = headRotHistory[index];
-					dummyLeft.transform.rotation = leftRotHistory[index];
-					dummyRight.transform.rotation = rightRotHistory[index];
+	        		dummyHead.transform.rotation = headRotHistory[index] * Quaternion.Euler(-90f, 0f, 0f);
+	        		dummyLeft.transform.rotation = leftRotHistory[index] * Quaternion.Euler(-90f, 0f, 0f);
+	        		dummyRight.transform.rotation = rightRotHistory[index] * Quaternion.Euler(-90f, 0f, 0f);
 	    			break;
 	    		case 3:
 	    			confession.Play();
@@ -165,8 +168,10 @@ public class GameManager : MonoBehaviour
 	    		case 4:
 	    			ovrCameraRig.transform.position = startLocation;
 	    			localAvatar.transform.position = startLocation;
-	    			fHead.SetActive(true);
-	    			fBody.SetActive(true);
+	    			Toggle();
+	    			// fHead.SetActive(true);
+	    			// fHead.transform.SetParent(null);
+	    			// fBody.SetActive(true);
 	    			stage = 0;
 	    			index = 0;
 	    			ClearHistory();
@@ -188,6 +193,11 @@ public class GameManager : MonoBehaviour
     	headPosHistory.Clear();
     	headRotHistory.Clear();
     }
+
+    private void Toggle() {
+    	headObject.GetComponent<Camera>().cullingMask ^= 1 << LayerMask.NameToLayer("Freud");
+    	localAvatar.SetActive(!localAvatar.activeSelf);
+	}
 
     Vector3 LeftPosition(){
     	return leftObject.transform.position;
@@ -215,5 +225,9 @@ public class GameManager : MonoBehaviour
 
     Quaternion HeadRotation(){
     	return headObject.transform.rotation;
+    }
+
+    public int GetStage(){
+    	return stage;
     }
 }

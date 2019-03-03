@@ -9,6 +9,8 @@ public class FollowPlayer : MonoBehaviour
 
 	private GameObject ovrCameraRig;
 
+	private Vector3 target;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -18,12 +20,11 @@ public class FollowPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-    	// print("Following!");
-        Vector3 targetDir = ovrCameraRig.transform.position - transform.position;
-        // targetDir.Normalize();
-
-        // // Move our position a step closer to the target.
-        // transform.rotation = Quaternion.Euler(targetDir.x, targetDir.y, targetDir.z);
+    	if(GameManager.instance.GetStage() == 2)
+    		target = ovrCameraRig.transform.position + ovrCameraRig.transform.forward;
+    	else
+    		target = ovrCameraRig.transform.position;
+        Vector3 targetDir = target - transform.position;
         Quaternion newRotation = Quaternion.LookRotation(targetDir) * Quaternion.Euler(0, 90, 0);
 		transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, Time.deltaTime * 1.0f);
     }
