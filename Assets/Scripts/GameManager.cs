@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,7 +15,10 @@ public class GameManager : MonoBehaviour
 	private GameObject dummy;
 	private GameObject ovrCameraRig;
 	private GameObject localAvatar;
+
 	private GameObject therapist;
+	private GameObject fBody;
+	private GameObject fHead;
 
 	private GameObject headObject;
 	private GameObject leftObject;
@@ -32,6 +35,8 @@ public class GameManager : MonoBehaviour
 	private List<Quaternion> leftRotHistory;
 	private List<Quaternion> rightRotHistory;
 	private List<Quaternion> headRotHistory;
+
+	private AudioSource confession;
 
 	private bool allPresent;
 
@@ -51,6 +56,7 @@ public class GameManager : MonoBehaviour
 		leftRotHistory = new List<Quaternion>();
 		rightRotHistory = new List<Quaternion>();
 		headRotHistory = new List<Quaternion>();
+		confession = GetComponent<AudioSource>();
 		print("はじめ！");
 	}
 
@@ -59,6 +65,8 @@ public class GameManager : MonoBehaviour
  		index = 0;
  		CheckInputs();
 
+ 		fHead = GameObject.Find("Freud-Head");
+ 		fBody = GameObject.Find("Freud");
  		dummy = GameObject.Find("Dummy");
  		dummyHead = GameObject.Find("dHead");
  		dummyLeft = GameObject.Find("dLeft");
@@ -94,9 +102,9 @@ public class GameManager : MonoBehaviour
         		dummyLeft.transform.position = leftPosHistory[index];
         		dummyRight.transform.position = rightPosHistory[index];
 
-        		dummyHead.transform.rotation = headRotHistory[index];
-        		dummyLeft.transform.rotation = leftRotHistory[index];
-        		dummyRight.transform.rotation = rightRotHistory[index];
+        		dummyHead.transform.rotation = headRotHistory[index] * Quaternion.Euler(-90f, 0f, 0f);
+        		dummyLeft.transform.rotation = leftRotHistory[index] * Quaternion.Euler(-90f, 0f, 0f);
+        		dummyRight.transform.rotation = rightRotHistory[index] * Quaternion.Euler(-90f, 0f, 0f);
 
         		if(index < headPosHistory.Count - 1)
         			index++;
@@ -130,8 +138,15 @@ public class GameManager : MonoBehaviour
     		print("Stage " + stage);
 
 	    	switch(stage){
+	    		case 1:
+	    			confession.clip = Microphone.Start("", true, 300, 44100);
+	    			break;
 	    		case 2:
-	    			// Switch player location
+	    			Microphone.End("");
+
+	    			fHead.SetActive(false);
+	    			fBody.SetActive(false);
+	    			
 	    			ovrCameraRig.transform.position = therapist.transform.position;
 	    			localAvatar.transform.position = therapist.transform.position;
 
@@ -144,15 +159,21 @@ public class GameManager : MonoBehaviour
 					dummyLeft.transform.rotation = leftRotHistory[index];
 					dummyRight.transform.rotation = rightRotHistory[index];
 	    			break;
+	    		case 3:
+	    			confession.Play();
+	    			break;
 	    		case 4:
 	    			ovrCameraRig.transform.position = startLocation;
 	    			localAvatar.transform.position = startLocation;
+	    			fHead.SetActive(true);
+	    			fBody.SetActive(true);
 	    			stage = 0;
 	    			index = 0;
 	    			ClearHistory();
+	    			confession.clip = null;
 	    			dummy.SetActive(false);
 	    			break;
-	    			
+
 	    		default:
 	    			break;
 	    	}
